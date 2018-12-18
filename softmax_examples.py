@@ -22,6 +22,7 @@ _VAL_OVERFLOW = 710
 
 
 def naive_math(x: Collection[Number]) -> List[float]:
+    """https://en.wikipedia.org/wiki/Softmax_function"""
     x_exp = [math.exp(i) for i in x]
     sum_x_exp = sum(x_exp)
     _softmax = [i / sum_x_exp for i in x_exp]
@@ -29,6 +30,7 @@ def naive_math(x: Collection[Number]) -> List[float]:
 
 
 def naive_numpy(x: Union[Collection[Number], np.ndarray]) -> np.ndarray:
+    """https://en.wikipedia.org/wiki/Softmax_function"""
     x_exp = np.exp(x)
     return x_exp / np.sum(x_exp)
 
