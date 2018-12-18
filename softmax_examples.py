@@ -32,8 +32,8 @@ def naive_numpy(x: np.ndarray) -> np.ndarray:
     return x_exp / np.sum(x_exp)
 
 
-def naive_pytorch(x):
-    return torch.nn.Softmax()(torch.tensor(x))
+def naive_pytorch(x: Union[Collection[Number], np.ndarray]) -> torch.tensor:
+    return torch.nn.Softmax(dim=0)(torch.tensor(x))
 
 
 _WELL_BEHAVED_INPUT = [1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0]
@@ -48,19 +48,25 @@ _WELL_BEHAVED_OUTPUT = [
 ]
 
 
-def test_naive_math():
+def test_naive_math() -> None:
     output = naive_math(_WELL_BEHAVED_INPUT)
     np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT)
     return
 
 
-def test_naive_numpy():
+def test_naive_numpy() -> None:
     output = naive_numpy(_WELL_BEHAVED_INPUT)
     np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT)
     return
 
 
-def test_naive_pytorch():
+def test_naive_pytorch() -> None:
     output = naive_pytorch(_WELL_BEHAVED_INPUT).numpy()
     np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT)
     return
+
+
+if __name__ == "__main__":
+    print(naive_math(_WELL_BEHAVED_INPUT))
+    print(naive_numpy(_WELL_BEHAVED_INPUT))
+    print(naive_pytorch(_WELL_BEHAVED_INPUT).numpy())
