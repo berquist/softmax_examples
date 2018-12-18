@@ -60,37 +60,72 @@ _WELL_BEHAVED_OUTPUT = [
     0.4748329997443803,
     0.023640543021591385,
     0.06426165851049616,
-    0.17468129859572226
+    0.17468129859572226,
+]
+
+_UNDERFLOW_INPUT = [
+    _VAL_UNDERFLOW,
+    _VAL_UNDERFLOW + 1,
+    _VAL_UNDERFLOW + 2,
+    _VAL_UNDERFLOW + 3,
+    _VAL_UNDERFLOW + 10,
+]
+_UNDERFLOW_BAD_OUTPUT = [
+    0.0,
+    0.00021570319240724764,
+    0.0004314063848144953,
+    0.0008628127696289905,
+    0.9984900776531492,
+]
+_UNDERFLOW_GOOD_OUTPUT = [
+    4.53357274e-05,
+    1.23235284e-04,
+    3.34988233e-04,
+    9.10592426e-04,
+    9.98585848e-01,
 ]
 
 
 def test_naive_math() -> None:
-    output = naive_math(_WELL_BEHAVED_INPUT)
-    np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=1.0e-9)
+    well_behaved_output = naive_math(_WELL_BEHAVED_INPUT)
+    np.testing.assert_allclose(well_behaved_output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=1.0e-9)
+    underflow_output = naive_math(_UNDERFLOW_INPUT)
+    np.testing.assert_allclose(underflow_output, _UNDERFLOW_BAD_OUTPUT, rtol=0, atol=1.0e-9)
     return
 
 
 def test_naive_numpy() -> None:
-    output = naive_numpy(_WELL_BEHAVED_INPUT)
-    np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=1.0e-9)
+    well_behaved_output = naive_numpy(_WELL_BEHAVED_INPUT)
+    np.testing.assert_allclose(well_behaved_output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=1.0e-9)
+    underflow_output = naive_numpy(_UNDERFLOW_INPUT)
+    np.testing.assert_allclose(underflow_output, _UNDERFLOW_BAD_OUTPUT, rtol=0, atol=1.0e-9)
     return
 
 
 def test_naive_pytorch() -> None:
-    output = naive_pytorch(_WELL_BEHAVED_INPUT).numpy()
-    np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=7.5e-8)
+    well_behaved_output = naive_pytorch(_WELL_BEHAVED_INPUT).numpy()
+    np.testing.assert_allclose(well_behaved_output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=7.5e-8)
+    # PyTorch is safe to use.
+    underflow_output = naive_pytorch(_UNDERFLOW_INPUT).numpy()
+    np.testing.assert_allclose(underflow_output, _UNDERFLOW_GOOD_OUTPUT, rtol=0, atol=7.5e-8)
     return
 
 
 def test_log_pytorch() -> None:
-    output = log_pytorch(_WELL_BEHAVED_INPUT).numpy()
-    np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=7.5e-8)
+    well_behaved_output = log_pytorch(_WELL_BEHAVED_INPUT).numpy()
+    np.testing.assert_allclose(well_behaved_output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=7.5e-8)
+    # PyTorch is safe to use.
+    underflow_output = log_pytorch(_UNDERFLOW_INPUT).numpy()
+    np.testing.assert_allclose(underflow_output, _UNDERFLOW_GOOD_OUTPUT, rtol=0, atol=7.5e-8)
     return
 
 
 def test_scipy() -> None:
-    output = scipy(_WELL_BEHAVED_INPUT)
-    np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=1.0e-9)
+    well_behaved_output = scipy(_WELL_BEHAVED_INPUT)
+    np.testing.assert_allclose(well_behaved_output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=1.0e-9)
+    # SciPy is safe to use.
+    underflow_output = scipy(_UNDERFLOW_INPUT)
+    np.testing.assert_allclose(underflow_output, _UNDERFLOW_GOOD_OUTPUT, rtol=0, atol=1.0e-9)
     return
 
 
