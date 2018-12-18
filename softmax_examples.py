@@ -8,6 +8,7 @@ References:
 import math
 from typing import Collection, List, Union
 import numpy as np
+import scipy.special as ss
 import torch
 
 
@@ -27,7 +28,7 @@ def naive_math(x: Collection[Number]) -> List[float]:
     return _softmax
 
 
-def naive_numpy(x: np.ndarray) -> np.ndarray:
+def naive_numpy(x: Union[Collection[Number], np.ndarray]) -> np.ndarray:
     x_exp = np.exp(x)
     return x_exp / np.sum(x_exp)
 
@@ -44,6 +45,11 @@ def log_pytorch(x: Union[Collection[Number], np.ndarray]) -> torch.tensor:
     https://pytorch.org/docs/stable/torch.html#torch.exp
     """
     return torch.nn.LogSoftmax(dim=0)(torch.tensor(x)).exp()
+
+
+def scipy(x: Union[Collection[Number], np.ndarray]) -> np.ndarray:
+    """https://stackoverflow.com/a/48815016/"""
+    return np.exp(x - ss.logsumexp(x))
 
 
 _WELL_BEHAVED_INPUT = [1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0]
@@ -82,8 +88,15 @@ def test_log_pytorch() -> None:
     return
 
 
+def test_scipy() -> None:
+    output = scipy(_WELL_BEHAVED_INPUT)
+    np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=1.0e-9)
+    return
+
+
 if __name__ == "__main__":
     print(naive_math(_WELL_BEHAVED_INPUT))
     print(naive_numpy(_WELL_BEHAVED_INPUT))
     print(naive_pytorch(_WELL_BEHAVED_INPUT).numpy())
     print(log_pytorch(_WELL_BEHAVED_INPUT).numpy())
+    print(scipy(_WELL_BEHAVED_INPUT))
