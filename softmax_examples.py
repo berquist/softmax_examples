@@ -7,9 +7,13 @@ References:
 
 import math
 from typing import Collection, List, Union
+
 import numpy as np
 import scipy.special as ss
+
 import torch
+
+import pytest
 
 
 Number = Union[int, float]
@@ -87,20 +91,47 @@ _UNDERFLOW_GOOD_OUTPUT = [
     9.98585848e-01,
 ]
 
+_OVERFLOW_INPUT = [
+    _VAL_OVERFLOW,
+    _VAL_OVERFLOW - 1,
+    _VAL_OVERFLOW - 2,
+    _VAL_OVERFLOW - 3,
+    _VAL_OVERFLOW - 10,
+]
+_OVERFLOW_BAD_OUTPUT = [np.nan,  0.,  0.,  0.,  0.]
+_OVERFLOW_GOOD_OUTPUT = [
+    6.43895436e-01,
+    2.36875893e-01,
+    8.71417713e-02,
+    3.20576661e-02,
+    2.92328076e-05
+]
+
 
 def test_naive_math() -> None:
     well_behaved_output = naive_math(_WELL_BEHAVED_INPUT)
     np.testing.assert_allclose(well_behaved_output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=1.0e-9)
+    # The built-in math module is not safe to use.
     underflow_output = naive_math(_UNDERFLOW_INPUT)
     np.testing.assert_allclose(underflow_output, _UNDERFLOW_BAD_OUTPUT, rtol=0, atol=1.0e-9)
+    # The built-in math module is not safe to use.
+    # https://stackoverflow.com/a/44163840/
+    with pytest.raises(OverflowError):
+        overflow_output = naive_math(_OVERFLOW_INPUT)
     return
 
 
 def test_naive_numpy() -> None:
     well_behaved_output = naive_numpy(_WELL_BEHAVED_INPUT)
     np.testing.assert_allclose(well_behaved_output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=1.0e-9)
+    # NumPy is not safe to use.
     underflow_output = naive_numpy(_UNDERFLOW_INPUT)
     np.testing.assert_allclose(underflow_output, _UNDERFLOW_BAD_OUTPUT, rtol=0, atol=1.0e-9)
+    # NumPy is not safe to use.
+    # https://docs.pytest.org/en/latest/warnings.html#warns
+    with pytest.warns(RuntimeWarning):
+        overflow_output = naive_numpy(_OVERFLOW_INPUT)
+        np.testing.assert_allclose(overflow_output, _OVERFLOW_BAD_OUTPUT, rtol=0, atol=1.0e-9)        
     return
 
 
@@ -110,6 +141,9 @@ def test_naive_pytorch() -> None:
     # PyTorch is safe to use.
     underflow_output = naive_pytorch(_UNDERFLOW_INPUT).numpy()
     np.testing.assert_allclose(underflow_output, _UNDERFLOW_GOOD_OUTPUT, rtol=0, atol=7.5e-8)
+    # PyTorch is safe to use.
+    overflow_output = log_pytorch(_OVERFLOW_INPUT).numpy()
+    np.testing.assert_allclose(overflow_output, _OVERFLOW_GOOD_OUTPUT, rtol=0, atol=7.5e-8)
     return
 
 
@@ -119,6 +153,9 @@ def test_log_pytorch() -> None:
     # PyTorch is safe to use.
     underflow_output = log_pytorch(_UNDERFLOW_INPUT).numpy()
     np.testing.assert_allclose(underflow_output, _UNDERFLOW_GOOD_OUTPUT, rtol=0, atol=7.5e-8)
+    # PyTorch is safe to use.
+    overflow_output = log_pytorch(_OVERFLOW_INPUT).numpy()
+    np.testing.assert_allclose(overflow_output, _OVERFLOW_GOOD_OUTPUT, rtol=0, atol=7.5e-8)
     return
 
 
@@ -128,6 +165,9 @@ def test_scipy() -> None:
     # SciPy is safe to use.
     underflow_output = scipy(_UNDERFLOW_INPUT)
     np.testing.assert_allclose(underflow_output, _UNDERFLOW_GOOD_OUTPUT, rtol=0, atol=1.0e-9)
+    # SciPy is safe to use.
+    overflow_output = scipy(_OVERFLOW_INPUT)
+    np.testing.assert_allclose(overflow_output, _OVERFLOW_GOOD_OUTPUT, rtol=0, atol=1.0e-9)
     return
 
 
