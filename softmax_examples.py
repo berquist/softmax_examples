@@ -35,7 +35,7 @@ def naive_numpy(x: Union[Collection[Number], np.ndarray]) -> np.ndarray:
 
 def naive_pytorch(x: Union[Collection[Number], np.ndarray]) -> torch.tensor:
     """https://pytorch.org/docs/stable/nn.html#torch.nn.Softmax"""
-    return torch.nn.Softmax(dim=0)(torch.tensor(x))
+    return torch.nn.Softmax(dim=0)(torch.tensor(x).double())
 
 
 def log_pytorch(x: Union[Collection[Number], np.ndarray]) -> torch.tensor:
@@ -44,7 +44,7 @@ def log_pytorch(x: Union[Collection[Number], np.ndarray]) -> torch.tensor:
     https://pytorch.org/docs/stable/tensors.html#torch.Tensor.exp
     https://pytorch.org/docs/stable/torch.html#torch.exp
     """
-    return torch.nn.LogSoftmax(dim=0)(torch.tensor(x)).exp()
+    return torch.nn.LogSoftmax(dim=0)(torch.tensor(x).double()).exp()
 
 
 def scipy(x: Union[Collection[Number], np.ndarray]) -> np.ndarray:
