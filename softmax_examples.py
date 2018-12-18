@@ -8,6 +8,7 @@ References:
 import math
 from typing import Collection, List, Union
 import numpy as np
+import torch
 
 
 Number = Union[int, float]
@@ -31,6 +32,10 @@ def naive_numpy(x: np.ndarray) -> np.ndarray:
     return x_exp / np.sum(x_exp)
 
 
+def naive_pytorch(x):
+    return torch.nn.Softmax()(torch.tensor(x))
+
+
 _WELL_BEHAVED_INPUT = [1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0]
 _WELL_BEHAVED_OUTPUT = [
     0.023640543021591385,
@@ -51,5 +56,11 @@ def test_naive_math():
 
 def test_naive_numpy():
     output = naive_numpy(_WELL_BEHAVED_INPUT)
+    np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT)
+    return
+
+
+def test_naive_pytorch():
+    output = naive_pytorch(_WELL_BEHAVED_INPUT).numpy()
     np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT)
     return
