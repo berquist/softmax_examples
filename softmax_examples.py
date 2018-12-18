@@ -33,7 +33,17 @@ def naive_numpy(x: np.ndarray) -> np.ndarray:
 
 
 def naive_pytorch(x: Union[Collection[Number], np.ndarray]) -> torch.tensor:
+    """https://pytorch.org/docs/stable/nn.html#torch.nn.Softmax"""
     return torch.nn.Softmax(dim=0)(torch.tensor(x))
+
+
+def log_pytorch(x: Union[Collection[Number], np.ndarray]) -> torch.tensor:
+    """
+    https://pytorch.org/docs/stable/nn.html#logsoftmax
+    https://pytorch.org/docs/stable/tensors.html#torch.Tensor.exp
+    https://pytorch.org/docs/stable/torch.html#torch.exp
+    """
+    return torch.nn.LogSoftmax(dim=0)(torch.tensor(x)).exp()
 
 
 _WELL_BEHAVED_INPUT = [1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0]
@@ -50,19 +60,25 @@ _WELL_BEHAVED_OUTPUT = [
 
 def test_naive_math() -> None:
     output = naive_math(_WELL_BEHAVED_INPUT)
-    np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT)
+    np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=1.0e-9)
     return
 
 
 def test_naive_numpy() -> None:
     output = naive_numpy(_WELL_BEHAVED_INPUT)
-    np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT)
+    np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=1.0e-9)
     return
 
 
 def test_naive_pytorch() -> None:
     output = naive_pytorch(_WELL_BEHAVED_INPUT).numpy()
-    np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT)
+    np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=7.5e-8)
+    return
+
+
+def test_log_pytorch() -> None:
+    output = log_pytorch(_WELL_BEHAVED_INPUT).numpy()
+    np.testing.assert_allclose(output, _WELL_BEHAVED_OUTPUT, rtol=0, atol=7.5e-8)
     return
 
 
@@ -70,3 +86,4 @@ if __name__ == "__main__":
     print(naive_math(_WELL_BEHAVED_INPUT))
     print(naive_numpy(_WELL_BEHAVED_INPUT))
     print(naive_pytorch(_WELL_BEHAVED_INPUT).numpy())
+    print(log_pytorch(_WELL_BEHAVED_INPUT).numpy())
